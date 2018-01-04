@@ -21,31 +21,28 @@ function loadjson(error, locations){
 	})
 	
 	for(i=0;i<urls.length;i++){
-		//d3.json(urls[0],function(data){
-		// setTimeout(function(){
-			$.ajax({
-				type: 'GET',
-				url: urls[i],
-				datatype: 'json',
-				success: function(data){
-					console.log(data.geocoding.query.text);
-						var lon = data.features[0].geometry.coordinates[0];
-						var lat = data.features[0].geometry.coordinates[1];
-						var geometry= {
-							type: "point",
-							x: lon,
-							y: lat
-						};
-						var attribute= {
-							objectID: i,
-							Place: data.geocoding.query.text,
-							Count: counts[i]
-						};
-						features.push({geometry: geometry, attributes: attribute});
-				},
-				async: false
-			});	
-		//},1000);
+		$.ajax({
+			type: 'GET',
+			url: urls[i],
+			datatype: 'json',
+			success: function(data){
+				console.log(data.geocoding.query.text);
+					var lon = data.features[0].geometry.coordinates[0];
+					var lat = data.features[0].geometry.coordinates[1];
+					var geometry= {
+						type: "point",
+						x: lon,
+						y: lat
+					};
+					var attribute= {
+						objectID: i,
+						Place: data.geocoding.query.text,
+						Count: counts[i]
+					};
+					features.push({geometry: geometry, attributes: attribute});
+			},
+			async: false
+		});	
 	}
 	
 	var a = document.body.appendChild(
