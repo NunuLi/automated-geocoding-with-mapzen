@@ -1,0 +1,63 @@
+<DOCTYPE! html>
+<html>
+<head>
+	<title>Mapzen Process</title>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
+var urls = [];
+var counts = [];
+var features = [];
+
+d3.queue()
+	.defer(d3.csv,"locations.csv")
+	.awaitAll(loadjson);
+	
+function loadjson(error, locations){
+	locations[0].forEach(function(d){
+		url = "https://search.mapzen.com/v1/search?text="+d.location+"&api_key=yourAPIkey";
+		urls.push(url);
+		counts.push(d.count);
+	})
+	
+	for(i=0;i<urls.length;i++){
+		//d3.json(urls[0],function(data){
+		// setTimeout(function(){
+			$.ajax({
+				type: 'GET',
+				url: urls[i],
+				datatype: 'json',
+				success: function(data){
+					console.log(data.geocoding.query.text);
+						var lon = data.features[0].geometry.coordinates[0];
+						var lat = data.features[0].geometry.coordinates[1];
+						var geometry= {
+							type: "point",
+							x: lon,
+							y: lat
+						};
+						var attribute= {
+							objectID: i,
+							Place: data.geocoding.query.text,
+							Count: counts[i]
+						};
+						features.push({geometry: geometry, attributes: attribute});
+				},
+				async: false
+			});	
+		//},1000);
+	}
+	
+	var a = document.body.appendChild(
+    	document.createElement("a")
+    );
+    a.download = "geocoded.json";
+	a.href = "data:text/plain;base64," + btoa(JSON.stringify(features));
+	a.innerHTML = "download geocoded address";
+}
+</script>
+</head>
+
+<body>
+</body>
+</html>
